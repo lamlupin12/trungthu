@@ -8,11 +8,16 @@ window.removeEventListener("click", playMusicOnce);
 window.addEventListener("click", playMusicOnce);
 
 const messages = [
-  "Em là vũ trụ của anh",
-  "Tình yêu bất tận giữa các vì sao",
-  "Em là ngôi sao sáng nhất",
-  "Anh tỏa sáng là vì em",
-  "Em thật tỏa sáng trên bầu trời của anh"
+  "Chúc Trung Thu vui vẻ 🎑",
+  "Vầng trăng sáng ngời 🌕",
+  "Yêu thương tròn đầy ❤️",
+  "Gia đình hạnh phúc 👨‍👩‍👧‍👦",
+  "Ước mơ bay cao ✨",
+  "Bình an và may mắn 🍀",
+  "Trăng rằm đoàn viên 🌸",
+  "Ngọt ngào như bánh nướng 🥮",
+  "Mãi bên nhau 🌙",
+  "Chúc em luôn xinh đẹp 💖"
 ];
 const fallingTexts = [];
 

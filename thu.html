@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>Bạn có thư nè</title>
+    <style>
+      /* lồng đèn rơi */
+      .lantern {
+        position: absolute;
+        bottom: 0;
+        pointer-events: none; /* không cản chuột */
+      }
+
+      @keyframes fall {
+        0% {
+          transform: translateY(-120px);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(110vh);
+          opacity: 0.8;
+        }
+      }
+
+      /* nút chuyển trang */
+      .gift-link {
+        margin-top: 200px;
+        font-size: 18px;
+        text-decoration: none;
+        background: #ff4d6d;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: 0.3s;
+      }
+      .gift-link:hover {
+        background: #ff1e50;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="envelope-container" style="margin-bottom: 100px">
+        <div class="envelope">
+          <div class="envelope__letter">
+            <p>
+              ✨ "Trung Thu đến rồi! Chúc em luôn vui vẻ, hạnh phúc, ngọt ngào như chiếc bánh nướng, và luôn được
+              yêu thương ." 💖
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- thẻ a chuyển trang -->
+      <a href="qua.html" class="gift-link">🎁 Nhấn vào đây để nhận quà</a>
+    </div>
+
+    <!-- lồng đèn rơi nhiều cái -->
+    <script>
+      const lanternContainer = document.body; // hoặc 1 div riêng
+
+      function createLantern() {
+        const lantern = document.createElement("div");
+        lantern.className = "lantern";
+
+        lantern.innerHTML = `<img src="den.png" style="width:100%">`;
+
+        // random kích thước
+        const size = 40 + Math.random() * 40;
+        lantern.style.width = size + "px";
+        lantern.style.left = Math.random() * 90 + "vw";
+        lantern.style.bottom = "0px";
+        lanternContainer.appendChild(lantern);
+
+        // random bay lên cao và trôi ngang
+        const drift = Math.random() * 140 - 70;
+        const up = 120 + Math.random() * 40;
+        const duration = 12000 + Math.random() * 4000;
+
+        lantern.animate(
+          [
+            { transform: "translate(0,0)" },
+            { transform: `translate(${drift}px,-${up}vh)` },
+          ],
+          { duration, easing: "linear", fill: "forwards" }
+        );
+
+        setTimeout(() => lantern.remove(), duration);
+      }
+
+      setInterval(() => createLantern(), 800);
+    </script>
+  </body>
+</html>
