@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Trung Thu Đặc Biệt</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --accent: #ff7f50;
+        --accent-2: #ff5722;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        font-family: "Mali", cursive;
+        background: #060614;
+        overflow: hidden;
+      }
+      .stage {
+        position: relative;
+        min-height: 100vh;
+        overflow: hidden;
+      }
+      canvas#starfield {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      /* 🌙 Trăng + thỏ ngọc */
+      .moon {
+        position: absolute;
+        top: 60px;
+        right: 100px;
+        width: 160px;
+        height: 160px;
+        background: radial-gradient(
+          circle at 30% 30%,
+          #fff,
+          #f8f8f8 70%,
+          #e0e0e0 100%
+        );
+        border-radius: 50%;
+        box-shadow: 0 0 50px #ffffff7a, 0 0 80px rgba(255, 255, 255, 0.7),
+          0 0 100px rgba(255, 255, 255, 0.4);
+        filter: drop-shadow(0 0 25px rgba(255, 255, 200, 0.8));
+        z-index: 10;
+        overflow: visible;
+      }
+      .rabbit {
+        position: absolute;
+        bottom: -20px;
+        left: 20px;
+        width: 80px;
+        animation: hop 3s ease-in-out infinite;
+      }
+      @keyframes hop {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px) rotate(-2deg);
+        }
+      }
+
+      /* 🎐 Đèn lồng */
+      #lantern-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+        z-index: 10;
+      }
+      .lantern {
+        position: absolute;
+        width: 40px;
+        pointer-events: auto;
+        user-select: none;
+      }
+      @keyframes swing {
+        0% {
+          transform: rotate(-5deg);
+        }
+        50% {
+          transform: rotate(5deg);
+        }
+        100% {
+          transform: rotate(-5deg);
+        }
+      }
+      .swing {
+        animation: swing 2s ease-in-out infinite;
+      }
+      .rotate {
+        animation: spin 8s linear infinite;
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 🎐 Lời chúc trong đèn */
+      .wish-text {
+        position: absolute;
+        bottom: 110%; /* hiện phía trên đèn */
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        padding: 6px 12px;
+        border-radius: 8px;
+        white-space: nowrap;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+      }
+      .wish-text.show {
+        opacity: 1;
+      }
+
+      /* 🎆 Pháo hoa */
+      .firework {
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: red;
+        pointer-events: none;
+      }
+
+      /* ☀️🌙 Toggle */
+      #toggle-theme {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        background: #ffa722;
+        color: #fff;
+        z-index: 30;
+        font-weight: bold;
+      }
+      body.day {
+        background: linear-gradient(#87ceeb, #fff);
+      }
+      .gift-button {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 8px 16px;
+        background: #ff4081;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        transition: background 0.3s;
+        cursor: pointer;
+        z-index: 1000;
+      }
+
+      .gift-button:hover {
+        background: #e91e63;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <canvas id="starfield"></canvas>
+
+      <div class="moon">
+        <img src="tho.png" alt="Thỏ Ngọc" class="rabbit" />
+      </div>
+
+      <!-- 🎐 Đèn lồng -->
+      <div id="lantern-container"></div>
+
+      <!-- ☀️🌙 Toggle -->
+      <button id="toggle-theme">🌙/☀️</button>
+
+      <!-- Nhạc nền -->
+      <audio id="bg-music" loop>
+        <source src="a.mp3" type="audio/mp3" />
+      </audio>
+      <audio id="ting-sound">
+        <source src="ting.mp3" type="audio/mp3" />
+      </audio>
+    </div>
+
+    <script>
+      // ===== Canvas sao và sao băng =====
+      const canvas = document.getElementById("starfield");
+      const ctx = canvas.getContext("2d");
+      let w,
+        h,
+        stars = [],
+        meteors = [];
+
+      function resizeCanvas() {
+        w = canvas.width = innerWidth;
+        h = canvas.height = innerHeight;
+        stars = [];
+        const count = Math.round((w * h) / 2200);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 0.9 + 0.1,
+            a: Math.random() * 0.8 + 0.2,
+            t: Math.random() * 0.02 + 0.002,
+          });
+        }
+      }
+      function drawStars() {
+        ctx.clearRect(0, 0, w, h);
+        for (const s of stars) {
+          s.a += (Math.random() > 0.5 ? 1 : -1) * s.t;
+          s.a = Math.max(0.05, Math.min(1, s.a));
+          ctx.beginPath();
+          ctx.globalAlpha = s.a;
+          ctx.fillStyle = "#fff";
+          ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
+      function createMeteor() {
+        const startX = Math.random() * w;
+        const startY = Math.random() * (h / 3);
+        const speed = Math.random() * 10 + 6;
+        meteors.push({
+          x: startX,
+          y: startY,
+          vx: speed + 6,
+          vy: speed / 2,
+          len: Math.random() * 120 + 100,
+          a: 1,
+        });
+      }
+      function drawMeteors() {
+        for (let i = meteors.length - 1; i >= 0; i--) {
+          const m = meteors[i];
+          const x2 = m.x - m.len;
+          const y2 = m.y - m.len / 2;
+          const g = ctx.createLinearGradient(m.x, m.y, x2, y2);
+          g.addColorStop(0, `rgba(255,255,255,${m.a})`);
+          g.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.strokeStyle = g;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(m.x, m.y);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+          m.x += m.vx;
+          m.y += m.vy;
+          m.a -= 0.02;
+          if (m.a <= 0 || m.x > w + 200 || m.y > h + 200) meteors.splice(i, 1);
+        }
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 1;
+      }
+      function loop() {
+        drawStars();
+        drawMeteors();
+        if (Math.random() < 0.01) createMeteor();
+        requestAnimationFrame(loop);
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+      loop();
+      // Bật nhạc nền
+      // const bgMusic = document.getElementById("bg-music");
+      // bgMusic.volume = 0.3;
+      // bgMusic.play().catch(()=>{ });
+
+      // ==== Đèn lồng + Lời chúc ====
+      // ==== Đèn lồng + Lời chúc ====
+      const lanternContainer = document.getElementById("lantern-container");
+      const wishes = [
+        "Chúc Trung Thu vui vẻ!",
+        "Gia đình hạnh phúc!",
+        "Mong ước thành hiện thực!",
+      ];
+      const tingSound = document.getElementById("ting-sound");
+
+      function createLantern(customWish) {
+        const lantern = document.createElement("div");
+        lantern.className = "lantern swing";
+
+        // Xác suất rơi vào quà đặc biệt (ví dụ 1/6)
+        const isGift = Math.random() < 0.16;
+        const message = isGift
+          ? "Món quà đặc biệt 🎁"
+          : customWish || wishes[Math.floor(Math.random() * wishes.length)];
+
+        lantern.innerHTML = `
+    <img src="den.png" style="width:100%">
+    <div class="wish-text">
+      ${message}
+      ${
+        isGift
+          ? '<br><a href="./qua.html" class="gift-button">🎁 Nhấn vào đây để nhận quà</a>'
+          : ""
+      }
+    </div>
+  `;
+        if (Math.random() < 0.2) lantern.classList.add("rotate");
+
+        const size = 40 + Math.random() * 40;
+        lantern.style.width = size + "px";
+        lantern.style.left = Math.random() * 90 + "vw";
+        lantern.style.bottom = "0px";
+        lanternContainer.appendChild(lantern);
+
+        const drift = Math.random() * 140 - 70;
+        const up = 120 + Math.random() * 40;
+        const duration = 12000 + Math.random() * 4000;
+        lantern.animate(
+          [
+            { transform: "translate(0,0)" },
+            { transform: `translate(${drift}px,-${up}vh)` },
+          ],
+          { duration, easing: "linear", fill: "forwards" }
+        );
+        setTimeout(() => lantern.remove(), duration);
+
+        const wishBox = lantern.querySelector(".wish-text");
+        lantern.addEventListener("click", (e) => {
+          e.stopPropagation();
+          tingSound.play();
+          // Toggle hiển thị: click lần 1 mở, click lần 2 đóng
+          wishBox.classList.toggle("show");
+        });
+
+        // Cho phép click vào link bên trong mà không bị chặn
+        wishBox.addEventListener("click", (e) => {
+          e.stopPropagation();
+        });
+        if (!wishBox.querySelector(".gift-button")) {
+          setTimeout(() => wishBox.classList.remove("show"), 4000);
+        }
+      }
+      setInterval(() => createLantern(), 800);
+
+      // ==== Firework click ====
+      document.addEventListener("click", (e) => {
+        if (e.target.closest(".lantern")) return;
+        for (let i = 0; i < 30; i++) {
+          const fw = document.createElement("div");
+          fw.className = "firework";
+          fw.style.left = e.clientX + "px";
+          fw.style.top = e.clientY + "px";
+          fw.style.background = `hsl(${Math.random() * 360},100%,50%)`;
+          document.body.appendChild(fw);
+          const x = (Math.random() - 0.5) * 300;
+          const y = (Math.random() - 0.5) * 300;
+          fw.animate(
+            [
+              { transform: "translate(0,0)", opacity: 1 },
+              { transform: `translate(${x}px,${y}px)`, opacity: 0 },
+            ],
+            { duration: 2000, fill: "forwards" }
+          );
+          setTimeout(() => fw.remove(), 2000);
+        }
+      });
+
+      // ==== Theme toggle ====
+      const toggleBtn = document.getElementById("toggle-theme");
+      toggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("day");
+      });
+    </script>
+  </body>
+</html>
