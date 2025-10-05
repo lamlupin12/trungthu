@@ -49,30 +49,31 @@ body {
       border: 2px solid #00000024;
     }
 
-    .envelope__letter {
-      left: 29px;
-      z-index: 3;
-      width: 158px;
-      bottom: 17px;
-      height: 100px;
-      cursor: pointer;
-      font-size: 13px;
-      font-style: oblique;
-      padding: 12px 18px;
-      border-radius: 8px;
-      position: absolute;
-      box-sizing: border-box;
-      background-size: cover;
-      color: #a59090;
-      border: 1px solid #00000024;
-      transition: all 0.6s linear 0.4s;
-      background-image: url("https://i.pinimg.com/564x/bd/27/23/bd2723cccfec31aeb82b41034fdd2933.jpg");
-    }
+   .envelope__letter {
+  left: 29px;
+  z-index: 3;
+  width: 158px;
+  bottom: 17px;
+  height: 200px; /* mở sẵn, không cần hover */
+  cursor: default; /* không cần pointer nữa */
+  font-size: 13px;
+  font-style: oblique;
+  padding: 12px 18px;
+  border-radius: 8px;
+  position: absolute;
+  box-sizing: border-box;
+  background-size: cover;
+  color: #4c4444; /* cho hiện rõ luôn */
+  border: 1px solid #00000024;
+  background-image: url("https://i.pinimg.com/564x/bd/27/23/bd2723cccfec31aeb82b41034fdd2933.jpg");
+  transition: none; /* bỏ animation hover */
+}
 
-    .envelope:hover .envelope__letter {
+
+    /* .envelope:hover .envelope__letter {
       height: 200px;
       color: #4c4444;
-    }
+    } */
 
     .envelope__letter:before {
       content: "";

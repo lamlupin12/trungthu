@@ -282,10 +282,10 @@
       window.addEventListener("resize", resizeCanvas);
       resizeCanvas();
       loop();
-      // Bật nhạc nền
-      // const bgMusic = document.getElementById("bg-music");
-      // bgMusic.volume = 0.3;
-      // bgMusic.play().catch(()=>{ });
+    //   Bật nhạc nền
+      const bgMusic = document.getElementById("bg-music");
+      bgMusic.volume = 0.3;
+      bgMusic.play().catch(()=>{ });
 
       // ==== Đèn lồng + Lời chúc ====
       // ==== Đèn lồng + Lời chúc ====
@@ -302,7 +302,7 @@
         lantern.className = "lantern swing";
 
         // Xác suất rơi vào quà đặc biệt (ví dụ 1/6)
-        const isGift = Math.random() < 0.16;
+        const isGift = Math.random() < 0.25;
         const message = isGift
           ? "Món quà đặc biệt 🎁"
           : customWish || wishes[Math.floor(Math.random() * wishes.length)];
